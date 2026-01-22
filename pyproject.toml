@@ -1,0 +1,130 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fraud-detection-mlops"
+version = "1.0.0"
+description = "Complete MLOps pipeline for fraud detection using Random Forest, MLflow, DVC, and ZenML"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Mohamed Administrateur", email = "your.email@example.com"}
+]
+keywords = ["mlops", "fraud-detection", "machine-learning", "mlflow", "dvc", "zenml"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "numpy>=1.26.0",
+    "pandas>=2.0.0",
+    "scikit-learn>=1.3.0",
+    "mlflow>=2.9.0",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
+    "joblib>=1.3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "flake8>=6.1.0",
+    "black>=23.7.0",
+    "isort>=5.12.0",
+    "mypy>=1.5.0",
+]
+zenml = [
+    "zenml>=0.55.0",
+    "sqlalchemy-utils>=0.41.0",
+    "sqlmodel>=0.0.8",
+]
+dvc = ["dvc>=3.0.0"]
+notebook = ["jupyter>=1.0.0", "notebook>=7.0.0"]
+all = [
+    "zenml>=0.55.0",
+    "dvc>=3.0.0",
+    "jupyter>=1.0.0",
+    "notebook>=7.0.0",
+    "sqlalchemy-utils>=0.41.0",
+    "sqlmodel>=0.0.8",
+]
+
+[project.urls]
+Homepage = "https://github.com/YOUR_USERNAME/fraud-detection-mlops"
+Documentation = "https://github.com/YOUR_USERNAME/fraud-detection-mlops#readme"
+Repository = "https://github.com/YOUR_USERNAME/fraud-detection-mlops"
+Issues = "https://github.com/YOUR_USERNAME/fraud-detection-mlops/issues"
+
+[project.scripts]
+fraud-detection = "run_simple_fraud_detection:main"
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yml", "*.yaml", "*.md", "*.txt"]
+
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | \.eggs
+  | build
+  | dist
+  | mlruns
+  | .dvc
+  | .zen
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip_gitignore = true
+skip = [".venv", "mlruns", ".dvc", ".zen"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --cov=src --cov-report=html --cov-report=term"
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = "E203, W503"
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "build",
+    "dist",
+    "mlruns",
+    ".dvc",
+    ".zen"
+]

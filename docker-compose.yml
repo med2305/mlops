@@ -1,0 +1,94 @@
+services:
+  # ZenML Server
+  zenml:
+    image: zenmldocker/zenml-server:0.70.0
+    container_name: zenml-server
+    ports:
+      - "8237:8080"
+    environment:
+      - ZENML_STORE_URL=sqlite:////zenml/.zenconfig/local_stores/default_zen_store/zenml.db
+      - ZENML_DEFAULT_USER_NAME=default
+      - ZENML_DEFAULT_USER_PASSWORD=
+    volumes:
+      - zenml-data:/zenml
+    networks:
+      - mlops-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # MLflow Tracking Server
+  mlflow:
+    image: python:3.9-slim
+    container_name: mlflow-server
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlruns
+      - ./mlartifacts:/mlartifacts
+    command: >
+      sh -c "pip install mlflow boto3 &&
+             mlflow server 
+             --host 0.0.0.0 
+             --port 5000 
+             --backend-store-uri sqlite:///mlruns/mlflow.db
+             --default-artifact-root /mlartifacts"
+    networks:
+      - mlops-network
+
+  # Main Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mlops-app
+    depends_on:
+      - mlflow
+      - zenml
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - ZENML_CONFIG_PATH=/app/.zen
+      - ZENML_STORE_URL=http://zenml:8080
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./mlruns:/app/mlruns
+      - ./src:/app/src
+      - ./.dvc:/app/.dvc
+      - ./.zen:/app/.zen
+    networks:
+      - mlops-network
+    command: python src/pipelines/training_pipeline.py
+
+  # Jupyter Notebook (optional for development)
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jupyter-notebook
+    ports:
+      - "8888:8888"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - ZENML_CONFIG_PATH=/app/.zen
+    volumes:
+      - ./notebooks:/app/notebooks
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./src:/app/src
+      - ./.dvc:/app/.dvc
+      - ./.zen:/app/.zen
+    networks:
+      - mlops-network
+    command: jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token=''
+
+networks:
+  mlops-network:
+    driver: bridge
+
+volumes:
+  mlruns:
+  mlartifacts:
+  zenml-data:

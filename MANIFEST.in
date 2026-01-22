@@ -1,0 +1,23 @@
+include README.md
+include LICENSE
+include requirements.txt
+include docker-compose.yml
+include Dockerfile
+include .env.example
+include QUICKSTART.md
+include GUIDE.md
+include ARCHITECTURE.md
+include FRAUD_DETECTION.md
+include PUBLISHING.md
+
+recursive-include src *.py
+recursive-include .github *.yml
+
+exclude run_experiments.py
+exclude run_simple_fraud_detection.py
+exclude setup.ps1
+
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude *.so
+global-exclude .DS_Store
