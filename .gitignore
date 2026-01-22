@@ -48,8 +48,11 @@ zenml_local_store/
 
 # DVC
 /data/raw/*
+!/data/raw/*.dvc
 /data/processed/*
+!/data/processed/*.dvc
 /models/*
+!/models/*.dvc
 !.gitkeep
 
 # OS
